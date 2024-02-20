@@ -1,3 +1,6 @@
+using DataAccess;
+using Microsoft.EntityFrameworkCore;
+
 namespace WebApi
 {
     public class Program
@@ -7,6 +10,14 @@ namespace WebApi
             var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
             var builder = WebApplication.CreateBuilder(args);
+            var connectionString = builder.Configuration.GetConnectionString("CarsDbContextConnection") ?? throw new InvalidOperationException("Connection string 'CarsDbContextConnection' not found.");
+
+            builder.Services.AddDbContext<CarsDbContext>(opts =>
+            {
+                opts.UseNpgsql(connectionString: "Server=localhost;Port=5432;User Id=postgres;Password=159874;Database=CarServiceDb;");
+            });
+
+            builder.Services.AddAutoMapper(typeof(Program));
 
             builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
@@ -15,7 +26,9 @@ namespace WebApi
                 options.AddPolicy(name: MyAllowSpecificOrigins,
                                   policy =>
                                   {
-                                      policy.WithOrigins("http://localhost:3000");
+                                      policy.WithOrigins("http://localhost:3000")
+                                      .AllowAnyHeader()
+                                      .AllowAnyMethod();
                                   });
             });
 

@@ -1,8 +1,7 @@
-﻿namespace BusinessEntities
+﻿namespace WebApi.DTOs.Clients
 {
-    public class Client
+    public class ClientCreateDTO
     {
-        public long Id { get; set; }
 
         public string FirstName { get; set; }
 
@@ -16,6 +15,5 @@
 
         public string Email { get; set; }
 
-        public List<Car> Cars { get; set; }
     }
 }
