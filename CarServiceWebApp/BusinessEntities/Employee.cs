@@ -23,6 +23,8 @@ namespace BusinessEntities
         public string Email { get; set; }
 
         public List<Specialization> Specializations { get; set; }
+
+        public bool IsActive { get; set; } = true;
     }
 
 }

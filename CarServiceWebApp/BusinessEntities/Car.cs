@@ -21,5 +21,7 @@ namespace BusinessEntities
         public long ClientId { get; set; }
 
         public Client Client { get; set; }
+
+        public bool IsActive { get; set; } = true;
     }
 }

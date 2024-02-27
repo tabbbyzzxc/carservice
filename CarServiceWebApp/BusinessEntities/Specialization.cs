@@ -15,5 +15,7 @@ namespace BusinessEntities
         public int Hours { get; set; }
 
         public decimal Price { get; set; }
+
+        public bool IsActive { get; set; } = true;
     }
 }

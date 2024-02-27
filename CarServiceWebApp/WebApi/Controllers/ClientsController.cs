@@ -24,7 +24,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("clients-list")]
-        public async Task<ClientListDTO> GetClients([FromQuery] int skip, [FromQuery] int take, [FromQuery] string? search = null)
+        public async Task<ClientListDTO> GetClients([FromQuery] int skip, [FromQuery] int take = 15, [FromQuery] string? search = null)
         {
             var query = _context.Clients.AsNoTracking();
             if (!string.IsNullOrWhiteSpace(search))
@@ -33,16 +33,20 @@ namespace WebApi.Controllers
                 query = query.Where(c => EF.Functions.ILike(c.FirstName, search) || EF.Functions.ILike(c.LastName, search));
             }
 
-            var total = await query.CountAsync();
+            var total = await query
+                .Where(c => c.IsActive)
+                .CountAsync();
             var clients = await query
-                .Include(x => x.Cars)
+                .Where(c => c.IsActive)
+                .OrderBy(c => c.FirstName)
+                .ThenBy(c => c.LastName)
+                .Include(x => x.Cars.Where(car => car.IsActive))
                 .Skip(skip)
                 .Take(take)
-                .ProjectTo<ClientDTO>(_mapper.ConfigurationProvider)
                 .ToListAsync();
+            var clientsDto = _mapper.Map<List<ClientDTO>>(clients);
 
-
-            return new ClientListDTO { Clients = clients, Total = total };
+            return new ClientListDTO { Clients = clientsDto, Total = total };
         }
 
         [HttpGet("get-client")]
@@ -50,11 +54,11 @@ namespace WebApi.Controllers
         {
             var query = _context.Clients.AsNoTracking();
             var client = query
-                .Include(x => x.Cars)/*.ProjectTo<CarDTO>(_mapper.ConfigurationProvider)*/
-                .ProjectTo<ClientDTO>(_mapper.ConfigurationProvider)
+                .Where(c => c.IsActive)
+                .Include(x => x.Cars.Where(car => car.IsActive))
                 .FirstOrDefault(c => c.Id == id);
 
-            return client;
+            return _mapper.Map<ClientDTO>(client);
         }
 
         [HttpPost("post-client")]
@@ -92,6 +96,29 @@ namespace WebApi.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { Message = "Data received successfully", Data = editedClientDTO });
+        }
+
+        [HttpDelete("delete-client/{clientId:long}")]
+        public async Task<IActionResult> DeleteClient([FromRoute] long clientId)
+        {
+            if (clientId == null)
+            {
+                return BadRequest("Invalid data");
+            }
+
+            var client = await _context.Clients.FindAsync(clientId);
+
+            if (client == null)
+            {
+                return NotFound("Client not found");
+            }
+
+            client.IsActive = false;
+
+            _context.Clients.Update(client);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Client deleted successfully" });
         }
     }
 }

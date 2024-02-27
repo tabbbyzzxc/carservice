@@ -27,6 +27,9 @@ namespace DataAccess
                 var clients = new DataGenerator().GenerateRandomClients(50);
                 var materials = new DataGenerator().GenerateRandomMaterials(100);
                 var employees = new DataGenerator().GenerateRandomEmployees(50);
+                var serviceOptions = new DataGenerator().GenerateRandomOptions();
+
+                ServiceOptions.Add(serviceOptions);
                 Clients.AddRange(clients);
                 Materials.AddRange(materials);
                 Employees.AddRange(employees);
@@ -47,6 +50,8 @@ namespace DataAccess
 
         public DbSet<Specialization> Specializations { get; set; }
 
+        public DbSet<ServiceOptions> ServiceOptions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Car>().HasOne(c => c.Client).WithMany(c => c.Cars).HasForeignKey(c => c.ClientId);
@@ -64,6 +69,7 @@ namespace DataAccess
                "Server=localhost;Port=5432;User Id=postgres;Password=159874;Database=CarServiceDb;");
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             base.OnConfiguring(optionsBuilder);
+            optionsBuilder.LogTo(Console.WriteLine);
         }
 
 

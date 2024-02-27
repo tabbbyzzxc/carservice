@@ -78,5 +78,63 @@ namespace FakeDataGenerator
 
             return employeeList;
         }
+
+        public ServiceOptions GenerateRandomOptions()
+        {
+
+            ServiceOptions options = new()
+            {
+                Main = 10,
+                Contacts = "{\"City\":\"New York\",\"Country\":\"USA\",\"State\":\"NY\",\"ZipCode\":\"10001\",\"Street\":\"123 Main St\", \"PhoneNumber\":\"+380931359244\", \"Email\":\"bambambam@gmail.com\"}",
+                WeekDays = @"
+{
+  ""Monday"": {
+    ""ShiftStartHour"": 9,
+    ""ShiftStartMinute"": 0,
+    ""ShiftEndHour"": 17,
+    ""ShiftEndMinute"": 0
+  },
+  ""Tuesday"": {
+    ""ShiftStartHour"": 9,  
+    ""ShiftStartMinute"": 0,
+    ""ShiftEndHour"": 17,
+    ""ShiftEndMinute"": 0
+  },
+  ""Wednesday"": {
+    ""ShiftStartHour"": 9,
+    ""ShiftStartMinute"": 0,
+    ""ShiftEndHour"": 17,
+    ""ShiftEndMinute"": 0
+  },
+  ""Thursday"": {
+    ""ShiftStartHour"": 9,
+    ""ShiftStartMinute"": 0,
+    ""ShiftEndHour"": 17,
+    ""ShiftEndMinute"": 0
+  },
+  ""Friday"": {
+    ""ShiftStartHour"": 9,
+    ""ShiftStartMinute"": 0,
+    ""ShiftEndHour"": 17,
+    ""ShiftEndMinute"": 0
+  },
+  ""Saturday"": {
+    ""ShiftStartHour"": 10,
+    ""ShiftStartMinute"": 0,
+    ""ShiftEndHour"": 16,
+    ""ShiftEndMinute"": 0
+  },
+  ""Sunday"": {
+    ""ShiftStartHour"": 10,
+    ""ShiftStartMinute"": 0,
+    ""ShiftEndHour"": 16,
+    ""ShiftEndMinute"": 0
+  }
+}"
+            };
+
+            return options;
+        }
+
     }
 }

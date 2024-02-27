@@ -17,5 +17,7 @@
         public string Email { get; set; }
 
         public List<Car> Cars { get; set; }
+
+        public bool IsActive { get; set; } = true;
     }
 }

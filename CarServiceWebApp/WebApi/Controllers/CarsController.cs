@@ -29,10 +29,12 @@ namespace WebApi.Controllers
         {
             var query = _context.Cars.AsNoTracking();
             var car = query
-                .ProjectTo<CarDTO>(_mapper.ConfigurationProvider)
+                .Where(c => c.IsActive == true)
                 .FirstOrDefault(c => c.Id == id);
 
-            return car;
+            var carDTO = _mapper.Map<CarDTO>(car);
+
+            return carDTO;
         }
 
         [HttpPost("post-car")]
@@ -43,15 +45,15 @@ namespace WebApi.Controllers
             await _context.SaveChangesAsync();
 
             var cars = await _context.Cars.AsNoTracking()
-                .Where(c => c.ClientId == newCar.ClientId)
-                .ProjectTo<CarDTO>(_mapper.ConfigurationProvider)
+                .Where(c => c.ClientId == newCar.ClientId && c.IsActive == true)
                 .ToListAsync();
 
-            return new CarListDTO { Cars = cars };
+            var carsDTO = _mapper.Map<List<CarDTO>>(cars);
+            return new CarListDTO { Cars = carsDTO };
         }
 
         [HttpPut("edit-car/{carId:long}")]
-        public async Task<IActionResult> EditClient([FromRoute] long carId, [FromBody] CarEditDTO editedCarDTO)
+        public async Task<IActionResult> EditCar([FromRoute] long carId, [FromBody] CarEditDTO editedCarDTO)
         {
             if (editedCarDTO == null)
             {
@@ -70,9 +72,41 @@ namespace WebApi.Controllers
             _context.Cars.Update(car);
             await _context.SaveChangesAsync();
 
-            var clientCars = await _context.Cars.AsNoTracking().Where(c => c.ClientId == car.ClientId).ToListAsync();
+            var clientCars = await _context.Cars
+                .AsNoTracking()
+                .Where(c => c.ClientId == car.ClientId && c.IsActive == true)
+                .ToListAsync();
 
             return Ok(new { Message = "Data received successfully", Data = clientCars });
+        }
+
+        [HttpDelete("delete-car/{carId:long}")]
+        public async Task<IActionResult> DeleteCar([FromRoute] long carId)
+        {
+            if (carId == null)
+            {
+                return BadRequest("Invalid data");
+            }
+
+            var car = await _context.Cars.FindAsync(carId);
+
+            if (car == null)
+            {
+                return NotFound("Car not found");
+            }
+
+            car.IsActive = false;
+
+            _context.Cars.Update(car);
+            await _context.SaveChangesAsync();
+
+            var cars = await _context.Cars.AsNoTracking()
+                .Where(c => c.ClientId == car.ClientId && c.IsActive == true)
+                .ProjectTo<CarDTO>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+
+            return Ok(new { Message = "Car deleted successfully", Data = cars });
         }
     }
 }

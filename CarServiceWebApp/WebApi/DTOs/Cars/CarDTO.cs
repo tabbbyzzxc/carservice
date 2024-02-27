@@ -16,5 +16,6 @@ namespace WebApi.DTOs.Cars
 
         public long ClientId { get; set; }
 
+        public bool IsActive { get; set; }
     }
 }
